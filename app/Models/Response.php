@@ -17,7 +17,11 @@ class Response extends Model
         'user_id',
         'questionnaire_id',
         'question_id',
-        'option_id',
+        'selected_options'
+    ];
+
+    protected $casts = [
+        'selected_options' => 'array'
     ];
 
     public function user()
@@ -35,8 +39,9 @@ class Response extends Model
         return $this->belongsTo(Question::class);
     }
 
-    public function option()
+    public function getSelectedOptionsAttribute($value)
     {
-        return $this->belongsTo(Option::class);
+        $optionIds = json_decode($value, true);
+        return Option::whereIn('id', $optionIds)->get();
     }
 }

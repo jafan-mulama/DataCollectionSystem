@@ -41,4 +41,36 @@ class Questionnaire extends Model
     {
         return $this->hasMany(Response::class);
     }
+
+    /**
+     * Check if a user has responded to this questionnaire
+     *
+     * @param User $user
+     * @return bool
+     */
+    public function userHasResponded(User $user)
+    {
+        return $this->responses()->where('user_id', $user->id)->exists();
+    }
+
+    /**
+     * Get the response for a specific user
+     *
+     * @param User $user
+     * @return Response|null
+     */
+    public function getResponseForUser(User $user)
+    {
+        return $this->responses()->where('user_id', $user->id)->first();
+    }
+
+    /**
+     * Get the total number of responses
+     *
+     * @return int
+     */
+    public function getResponsesCount()
+    {
+        return $this->responses()->count();
+    }
 }

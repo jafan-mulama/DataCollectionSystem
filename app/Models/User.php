@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -11,6 +10,22 @@ use Laravel\Sanctum\HasApiTokens;
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
+
+    /**
+     * User role constants
+     */
+    const ROLE_ADMIN = 'admin';
+    const ROLE_LECTURER = 'lecturer';
+    const ROLE_STUDENT = 'student';
+
+    /**
+     * Available roles
+     */
+    public static $roles = [
+        self::ROLE_ADMIN => 'Administrator',
+        self::ROLE_LECTURER => 'Lecturer',
+        self::ROLE_STUDENT => 'Student',
+    ];
 
     /**
      * The attributes that are mass assignable.
@@ -44,28 +59,51 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
+    /**
+     * Get questionnaires created by the user
+     */
     public function questionnaires()
     {
         return $this->hasMany(Questionnaire::class);
     }
 
+    /**
+     * Get responses submitted by the user
+     */
     public function responses()
     {
         return $this->hasMany(Response::class);
     }
 
-    public function isLecturer()
+    /**
+     * Check if user is an admin
+     */
+    public function isAdmin(): bool
     {
-        return $this->role === 'lecturer';
+        return $this->role === self::ROLE_ADMIN;
     }
 
-    public function isStudent()
+    /**
+     * Check if user is a lecturer
+     */
+    public function isLecturer(): bool
     {
-        return $this->role === 'student';
+        return $this->role === self::ROLE_LECTURER;
     }
 
-    public function isAdmin()
+    /**
+     * Check if user is a student
+     */
+    public function isStudent(): bool
     {
-        return $this->role === 'admin';
+        return $this->role === self::ROLE_STUDENT;
+    }
+
+    /**
+     * Get role display name
+     */
+    public function getRoleDisplayName(): string
+    {
+        return self::$roles[$this->role] ?? 'Unknown Role';
     }
 }
